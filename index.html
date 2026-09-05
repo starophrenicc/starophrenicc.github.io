@@ -98,6 +98,18 @@
       pointer-events: none;
     }
 
+    #bomb {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    #bomb.clear {
+      opacity: 0;
+    }
+
     .center {
       display: grid;
       justify-items: center;
@@ -340,6 +352,8 @@
 
   <canvas id="viz" aria-hidden="true"></canvas>
 
+  <canvas id="bomb" aria-hidden="true"></canvas>
+
   <div class="center">
     <h1 class="wordmark" id="wordmark">civx<img class="star" src="star.png" alt="" aria-hidden="true"></h1>
     <p class="tagline">what's up ☺︎</p>
@@ -452,14 +466,114 @@
       }
     }
 
+    const bomb = document.getElementById("bomb");
+    const bctx = bomb.getContext("2d");
+    const starImg = new Image();
+    starImg.src = "star.png";
+
+    const STICKERS = ["civx", ".civx", "JamL", "civx.lol"];
+    const CX = 104;
+    const CY = 46;
+    const PER_FRAME = 16;
+
+    function buildStickers(W, H) {
+      const cols = Math.ceil(W / CX) + 2;
+      const rows = Math.ceil(H / CY) + 2;
+      const list = [];
+
+      for (let y = -1; y < rows; y++) {
+        for (let x = -1; x < cols; x++) {
+          list.push({
+            x: x * CX + (y % 2 ? CX / 2 : 0) + (Math.random() - 0.5) * CX * 0.3,
+            y: y * CY + (Math.random() - 0.5) * CY * 0.3,
+            r: (Math.random() * 50 - 25) * Math.PI / 180,
+            star: Math.random() < 0.26,
+            alt: Math.random() < 0.5,
+            text: STICKERS[Math.floor(Math.random() * STICKERS.length)],
+            size: 26 + Math.random() * 16
+          });
+        }
+      }
+
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+      return list;
+    }
+
+    function pill(x, y, w, h, r) {
+      bctx.beginPath();
+      if (bctx.roundRect) bctx.roundRect(x, y, w, h, r);
+      else bctx.rect(x, y, w, h);
+      bctx.fill();
+    }
+
+    function drawSticker(s) {
+      bctx.save();
+      bctx.translate(s.x, s.y);
+      bctx.rotate(s.r);
+
+      if (s.star && starImg.complete && starImg.naturalWidth) {
+        const w = Math.max(s.size * 2.7, CX * 1.25);
+        bctx.drawImage(starImg, -w / 2, -w / 2, w, w);
+      } else {
+        bctx.font = "700 " + s.size + "px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+        const tw = bctx.measureText(s.text).width;
+        const pw = Math.max(tw + s.size * 0.9, CX * 1.25);
+        const ph = Math.max(s.size * 1.5, CY * 1.45);
+        bctx.fillStyle = s.alt ? "#f59409" : "#ffffff";
+        pill(-pw / 2, -ph / 2, pw, ph, s.size * 0.3);
+        bctx.fillStyle = s.alt ? "#ffffff" : "#f59409";
+        bctx.textAlign = "center";
+        bctx.textBaseline = "middle";
+        bctx.fillText(s.text, 0, 1);
+      }
+
+      bctx.restore();
+    }
+
+    function runBomb(done) {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      bomb.width = W * dpr;
+      bomb.height = H * dpr;
+      bomb.style.width = W + "px";
+      bomb.style.height = H + "px";
+      bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const list = buildStickers(W, H);
+      let i = 0;
+
+      (function step() {
+        for (let k = 0; k < PER_FRAME && i < list.length; k++, i++) drawSticker(list[i]);
+        if (i < list.length) requestAnimationFrame(step);
+        else done();
+      })();
+    }
+
     function enterSite() {
       if (entered) return;
       entered = true;
       startSpectrum();
       track.play().catch(() => { });
-      document.body.classList.add("entered");
       enter.classList.add("gone");
-      enter.addEventListener("transitionend", () => enter.remove(), { once: true });
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.body.classList.add("entered");
+        enter.remove();
+        bomb.remove();
+        return;
+      }
+
+      runBomb(() => {
+        document.body.classList.add("entered");
+        enter.remove();
+        setTimeout(() => bomb.classList.add("clear"), 260);
+        setTimeout(() => bomb.remove(), 900);
+      });
     }
 
     enter.addEventListener("click", enterSite);
