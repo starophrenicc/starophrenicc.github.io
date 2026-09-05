@@ -305,7 +305,7 @@
     const count = Math.max(48, Math.floor(W / 15));
     const slot  = W / count;
     const barW  = slot * 0.55;
-    const base  = H - 18;
+    const base  = H;
     const maxH  = base - 8;
 
     for (let i = 0; i < count; i++) {
@@ -317,7 +317,9 @@
 
       ctx.beginPath();
       if (ctx.roundRect) {
-        ctx.roundRect(x, base - h, barW, h, barW / 2);
+        // Top corners only — rounding the bottom would leave visible
+        // notches now that the bases sit on the screen edge.
+        ctx.roundRect(x, base - h, barW, h, [barW / 2, barW / 2, 0, 0]);
       } else {
         ctx.rect(x, base - h, barW, h);
       }
