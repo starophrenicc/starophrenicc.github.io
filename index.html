@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>civx</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #ffc93c 0%, #ffb01f 45%, #ff9d0a 100%);
+      overflow: hidden;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .title {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(4rem, 18vw, 16rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: #fff;
+      text-shadow: 0 4px 24px rgba(200, 110, 0, 0.35);
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <svg class="bg" viewBox="0 0 1920 1200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0.3" y2="1">
+        <stop offset="0%" stop-color="#ffcf49" />
+        <stop offset="45%" stop-color="#ffb01f" />
+        <stop offset="100%" stop-color="#ff9c08" />
+      </linearGradient>
+      <linearGradient id="veil" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30" />
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05" />
+      </linearGradient>
+      <g id="spark">
+        <path d="M0,-26 C3,-7 7,-3 26,0 C7,3 3,7 0,26 C-3,7 -7,3 -26,0 C-7,-3 -3,-7 0,-26 Z" fill="#fff" />
+      </g>
+    </defs>
+
+    <rect width="1920" height="1200" fill="url(#sky)" />
+
+    <path d="M1920,0 C1560,260 1280,620 1150,1200 L1920,1200 Z" fill="url(#veil)" />
+    <path d="M1920,150 C1640,400 1400,760 1330,1200 L1620,1200 C1660,780 1800,420 1920,300 Z" fill="#ffffff"
+      opacity="0.18" />
+
+    <path d="M0,900 C420,760 780,700 1160,780 C1470,845 1700,980 1920,1035 L1920,1200 L0,1200 Z" fill="#ffffff"
+      opacity="0.10" />
+    <path d="M0,955 C400,820 820,760 1210,850 C1520,922 1720,1050 1920,1105 L1920,1200 L0,1200 Z" fill="#ffffff"
+      opacity="0.13" />
+    <path d="M0,830 C360,700 700,660 1050,730 C1400,800 1650,930 1920,960" fill="none" stroke="#ffffff"
+      stroke-opacity="0.45" stroke-width="4" />
+    <path d="M0,880 C340,770 720,730 1090,810 C1430,884 1680,1000 1920,1030" fill="none" stroke="#ffffff"
+      stroke-opacity="0.30" stroke-width="3" />
+    <path d="M60,1040 C420,900 800,860 1180,930 C1500,990 1720,1090 1920,1120" fill="none" stroke="#ffffff"
+      stroke-opacity="0.22" stroke-width="2" />
+
+    <g fill="none" stroke="#ffffff">
+      <circle cx="110" cy="800" r="16" stroke-width="9" stroke-opacity="0.95" />
+      <circle cx="196" cy="731" r="15" stroke-width="8" stroke-opacity="0.85" />
+      <circle cx="250" cy="752" r="19" stroke-width="10" stroke-opacity="0.75" />
+      <circle cx="308" cy="717" r="9" stroke-width="6" stroke-opacity="0.8" />
+      <circle cx="384" cy="682" r="14" stroke-width="8" stroke-opacity="0.9" />
+      <circle cx="509" cy="767" r="13" stroke-width="8" stroke-opacity="0.85" />
+      <circle cx="561" cy="690" r="18" stroke-width="10" stroke-opacity="0.9" />
+      <circle cx="686" cy="618" r="14" stroke-width="8" stroke-opacity="0.85" />
+      <circle cx="733" cy="681" r="24" stroke-width="12" stroke-opacity="0.95" />
+      <circle cx="1054" cy="800" r="16" stroke-width="9" stroke-opacity="0.9" />
+      <circle cx="1170" cy="736" r="18" stroke-width="9" stroke-opacity="0.8" />
+      <circle cx="1222" cy="782" r="17" stroke-width="9" stroke-opacity="0.85" />
+      <circle cx="1388" cy="732" r="15" stroke-width="8" stroke-opacity="0.8" />
+      <circle cx="1494" cy="843" r="14" stroke-width="8" stroke-opacity="0.85" />
+      <circle cx="1588" cy="772" r="20" stroke-width="10" stroke-opacity="0.9" />
+      <circle cx="1753" cy="719" r="18" stroke-width="9" stroke-opacity="0.85" />
+      <circle cx="1795" cy="795" r="24" stroke-width="12" stroke-opacity="0.9" />
+    </g>
+
+
+    <g fill="#ffffff">
+      <circle cx="150" cy="761" r="5" opacity="0.9" />
+      <circle cx="205" cy="682" r="4" opacity="0.85" />
+      <circle cx="238" cy="716" r="6" opacity="0.8" />
+      <circle cx="299" cy="753" r="5" opacity="0.75" />
+      <circle cx="345" cy="694" r="5" opacity="0.8" />
+      <circle cx="441" cy="686" r="6" opacity="0.85" />
+      <circle cx="546" cy="775" r="5" opacity="0.8" />
+      <circle cx="744" cy="632" r="5" opacity="0.85" />
+      <circle cx="1044" cy="757" r="5" opacity="0.8" />
+      <circle cx="1112" cy="765" r="6" opacity="0.85" />
+      <circle cx="1168" cy="789" r="4" opacity="0.75" />
+      <circle cx="1186" cy="678" r="6" opacity="0.85" />
+      <circle cx="1298" cy="742" r="5" opacity="0.8" />
+      <circle cx="1451" cy="748" r="5" opacity="0.8" />
+      <circle cx="1503" cy="789" r="6" opacity="0.85" />
+      <circle cx="1812" cy="746" r="5" opacity="0.8" />
+      <circle cx="96" cy="741" r="4" opacity="0.7" />
+      <circle cx="151" cy="759" r="4" opacity="0.7" />
+    </g>
+
+    <g opacity="0.95">
+      <use href="#spark" x="748" y="573" transform="translate(748,573) scale(0.85) translate(-748,-573)" />
+      <use href="#spark" x="316" y="672" />
+      <use href="#spark" x="632" y="748" transform="translate(632,748) scale(1.2) translate(-632,-748)" />
+      <use href="#spark" x="1320" y="706" />
+      <use href="#spark" x="1836" y="678" transform="translate(1836,678) scale(0.8) translate(-1836,-678)" />
+      <use href="#spark" x="1646" y="822" transform="translate(1646,822) scale(1.1) translate(-1646,-822)" />
+    </g>
+  </svg>
+
+  <div class="title">civx</div>
+
+</body>
+
+</html>
