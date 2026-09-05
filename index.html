@@ -176,7 +176,7 @@
     }
 
     /* The wordmark now waits for the click rather than page load, so the
-     entrance and the music land to.wordgether. */
+     entrance and the music land together. */
     body.entered .wordmark {
       animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
     }
@@ -405,14 +405,14 @@
 
   <div class="views" id="views">3,227 views</div>
 
-  <audio id="morgue" src="morgue.mp3" preload="auto"></audio>
+  <audio id="jaydes" src="jaydes.mp3" preload="auto"></audio>
 
   <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
     <p>click anywhere</p>
   </div>
 
   <script>
-    const track = document.getElementById("morgue");
+    const track = document.getElementById("jaydes");
     const volume = document.getElementById("volume");
     const enter = document.getElementById("enter");
     const canvas = document.getElementById("viz");
@@ -542,18 +542,27 @@
       })
       .catch(() => { }); // Leave the fallback number in place.
 
-    /* ---- scrolling tab title ---- */
+    /* ---- tab title animation ---- */
 
-    // Rotating the string one character at a time reads as right-to-left
-    // motion. The separator keeps a visible gap between repetitions —
-    // browsers trim plain trailing spaces from titles.
+    // Types the name in, holds, deletes it a letter at a time, then rests on
+    // a Hangul filler (U+3164) — an empty title makes browsers fall back to
+    // showing the URL instead of a blank tab.
     const TITLE = "civx";
-    let tick = 0;
+    const HOLD = 4;  // steps sitting on the full word
+    const REST = 2;  // steps sitting blank before typing again
+
+    const frames = [];
+    for (let i = 1; i <= TITLE.length; i++) frames.push(TITLE.slice(0, i));
+    for (let i = 0; i < HOLD; i++) frames.push(TITLE);
+    for (let i = TITLE.length - 1; i >= 1; i--) frames.push(TITLE.slice(0, i));
+    for (let i = 0; i < REST; i++) frames.push("\u3164");
+
+    let step = 0;
 
     setInterval(() => {
-      document.title = TITLE.slice(tick) + TITLE.slice(0, tick);
-      tick = (tick + 1) % TITLE.length;
-    }, 320);
+      document.title = frames[step % frames.length];
+      step++;
+    }, 260);
   </script>
 
 </body>
