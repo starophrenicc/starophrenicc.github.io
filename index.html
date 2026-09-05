@@ -9,14 +9,12 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="favicon.ico">
 
-  <!-- embeds -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://civx.lol/">
   <meta property="og:title" content="civx">
   <meta property="og:description" content="yoooo">
   <meta property="og:image" content="https://civx.lol/poster.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <!--embed color bar -->
   <meta name="theme-color" content="#f59409">
   <style>
     html,
@@ -26,7 +24,6 @@
     }
 
     body {
-      /*sup*/
       background: #0a1230;
       display: grid;
       place-items: center;
@@ -42,8 +39,6 @@
       object-fit: cover;
       z-index: -2;
     }
-
-    /*  spectrum  */
 
     #viz {
       position: fixed;
@@ -61,8 +56,6 @@
     body.entered #viz {
       opacity: 1;
     }
-
-    /*  enter screen */
 
     .enter {
       position: fixed;
@@ -105,7 +98,6 @@
       pointer-events: none;
     }
 
-
     .center {
       display: grid;
       justify-items: center;
@@ -119,7 +111,6 @@
       font-weight: 700;
       letter-spacing: -0.03em;
       color: #fff;
-      /* word backdrop */
       text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
       user-select: none;
       opacity: 0;
@@ -136,22 +127,18 @@
       opacity: 0;
     }
 
-
     body.entered .tagline {
       animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.55s forwards;
     }
 
-    /* this the lil star in the i*/
     .wordmark .star {
       position: absolute;
       left: 38%;
       top: calc(30% - 0.035em);
       width: 0.09em;
       height: auto;
-      /* 16px pic so its good qual*/
       image-rendering: pixelated;
       pointer-events: none;
-      /* straight yams in my face */
       transform: translate(-50%, -50%);
       animation: spin 14s linear infinite;
     }
@@ -166,7 +153,6 @@
       }
     }
 
-    /* this is so  the music and title play together */
     body.entered .wordmark {
       animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
     }
@@ -185,14 +171,11 @@
       }
     }
 
-    /*  bottom left animation  */
-
     .ticker {
       position: fixed;
       left: 14px;
       bottom: 8px;
       width: 150px;
-      /* overlaying i*/
       z-index: 11;
       overflow: hidden;
       transform: translate(calc(50vw - 89px), calc(-50vh + 58px));
@@ -234,8 +217,6 @@
       }
     }
 
-
-    /*  volume control  */
     .volume {
       position: fixed;
       top: 20px;
@@ -324,7 +305,6 @@
         animation: none;
       }
 
-      /* animation is suppressed here, so reveal the wordmark outright. */
       body.entered .wordmark {
         animation: none;
         opacity: 1;
@@ -367,9 +347,7 @@
     <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
   </div>
 
-
-
-  <audio id="jaydes" src="jaydes.mp3" preload="auto"></audio>
+  <audio id="jaydes" preload="auto"></audio>
 
   <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
     <p>click anywhere</p>
@@ -381,11 +359,20 @@
     const enter = document.getElementById("enter");
     const canvas = document.getElementById("viz");
 
+    const TRACKS = [
+      "jaydes.mp3",
+      "back.mp3",
+      "boutit.mp3",
+      "cry.mp3",
+      "highschool.mp3",
+      "jodeci.mp3",
+    ];
+
+    track.src = TRACKS[Math.floor(Math.random() * TRACKS.length)];
+
     track.volume = volume.value / 100;
 
     let entered = false;
-
-    /* ---- spectrum ---- */
 
     const ctx = canvas.getContext("2d");
     let analyser, bins, gradient, W, H;
@@ -468,9 +455,6 @@
       track.volume = volume.value / 100;
     });
 
-
-
-    /*  tab animation  */
     const TITLE = "civx";
     const HOLD = 4;
     const REST = 2;
