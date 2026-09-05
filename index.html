@@ -305,8 +305,11 @@
     const count = Math.max(48, Math.floor(W / 15));
     const slot  = W / count;
     const barW  = slot * 0.55;
-    const base  = H;
-    const maxH  = base - 8;
+    // Two pixels past the edge: canvas bitmaps get floored to whole device
+    // pixels, so on fractional-DPR displays an exact H can leave a hairline.
+    // The overflow is clipped by the canvas, so this costs nothing.
+    const base  = H + 2;
+    const maxH  = H - 8;
 
     for (let i = 0; i < count; i++) {
       // Squaring the index spreads the low end out; music has far more
