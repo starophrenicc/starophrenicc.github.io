@@ -1,448 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>civx</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>civx</title>
 
-  <link rel="icon" href="favicon.ico" sizes="any">
-  <link rel="apple-touch-icon" href="favicon.ico">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="favicon.ico">
 
-  <!-- embed section :eyes: -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://civx.lol/">
-  <meta property="og:title" content="civx">
-  <meta property="og:description" content="civx loves you ᢉ𐭩">
-  <meta property="og:image" content="https://civx.lol/poster.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <!-- vert embed barcolor -->
-  <meta name="theme-color" content="#f59409">
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
+<!-- Link preview (Discord, Twitter, iMessage, Slack). Discord doesn't run
+     JS, so everything it shows comes from these tags. og:image must be an
+     absolute URL — a relative path silently produces no image. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://civx.lol/">
+<meta property="og:title" content="civx">
+<meta property="og:description" content="civx.lol">
+<meta property="og:image" content="https://civx.lol/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<!-- Colours the vertical bar on the left of the Discord embed. -->
+<meta name="theme-color" content="#f59409">
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
 
-    body {
-      /* Fallback + first-paint color, sampled from the clip so the
+  body {
+    /* Fallback + first-paint color, sampled from the clip so the
        transition into video is invisible. */
-      background: #0a1230;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
+    background: #0a1230;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
 
-    #bg {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -2;
-    }
+  #bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
 
-    /* ---- spectrum ---- */
+  /* ---- spectrum ---- */
 
-    #viz {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: 32vh;
-      max-height: 260px;
-      z-index: -1;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 1.1s ease 0.25s;
-    }
+  #viz {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 32vh;
+    max-height: 260px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.1s ease 0.25s;
+  }
 
-    body.entered #viz {
-      opacity: 1;
-    }
+  body.entered #viz {
+    opacity: 1;
+  }
 
-    /* ---- enter screen ---- */
+  /* ---- enter screen ---- */
 
-    .enter {
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      display: grid;
-      place-items: center;
-      background: rgba(4, 8, 22, 0.55);
-      backdrop-filter: blur(3px);
-      cursor: pointer;
-      transition: opacity 0.55s ease, backdrop-filter 0.55s ease;
-    }
+  .enter {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    background: rgba(4, 8, 22, 0.55);
+    backdrop-filter: blur(3px);
+    cursor: pointer;
+    transition: opacity 0.55s ease, backdrop-filter 0.55s ease;
+  }
 
-    .enter p {
-      margin: 0;
-      font-size: 0.9rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      color: rgba(255, 255, 255, 0.85);
-      text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
-      user-select: none;
-      animation: breathe 2.6s ease-in-out infinite;
-    }
+  .enter p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
+    user-select: none;
+    animation: breathe 2.6s ease-in-out infinite;
+  }
 
-    @keyframes breathe {
+  @keyframes breathe {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+  }
 
-      0%,
-      100% {
-        opacity: 0.55;
-      }
+  .enter.gone {
+    opacity: 0;
+    backdrop-filter: blur(0);
+    pointer-events: none;
+  }
 
-      50% {
-        opacity: 1;
-      }
-    }
+  /* ---- centre wordmark ---- */
 
-    .enter.gone {
-      opacity: 0;
-      backdrop-filter: blur(0);
-      pointer-events: none;
-    }
+  .wordmark {
+    position: relative;
+    margin: 0;
+    font-size: clamp(4rem, 18vw, 16rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #fff;
+    /* Keeps the word legible when a bright wave passes behind it. */
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
+    user-select: none;
+    opacity: 0;
+  }
 
-    /* ---- centre wordmark ---- */
+  /* Percentages are relative to the wordmark's own box, so the stars stay
+     locked to the letters at every viewport size. Sized in em for the same
+     reason. Nudge left/top per star to reposition. */
+  .wordmark .star {
+    position: absolute;
+    width: 0.13em;
+    height: auto;
+    transform: translate(-50%, -50%);
+    /* 16px source — keep the pixel edges hard instead of blurring. */
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
 
-    .wordmark {
-      margin: 0;
-      font-size: clamp(4rem, 18vw, 16rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      color: #fff;
-      /* Keeps the word legible when a bright wave passes behind it. */
-      text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
-      user-select: none;
-      opacity: 0;
-    }
+  .wordmark .s1 { left: 36%; top: 29%; }
+  .wordmark .s2 { left: 43%; top: 42%; }
+  .wordmark .s3 { left: 24%; top: 53%; }
+  .wordmark .s4 { left: 94%; top: 42%; }
 
-    /* The wordmark now waits for the click rather than page load, so the
+  /* The wordmark now waits for the click rather than page load, so the
      entrance and the music land together. */
-    body.entered .wordmark {
-      animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
-    }
+  body.entered .wordmark {
+    animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
+  }
 
-    @keyframes emerge {
-      from {
-        opacity: 0;
-        filter: blur(24px);
-        letter-spacing: 0.12em;
-      }
+  @keyframes emerge {
+    from { opacity: 0; filter: blur(24px); letter-spacing: 0.12em; }
+    to   { opacity: 1; filter: blur(0);    letter-spacing: -0.03em; }
+  }
 
-      to {
-        opacity: 1;
-        filter: blur(0);
-        letter-spacing: -0.03em;
-      }
-    }
+  /* ---- bottom-left ticker ---- */
 
-    /* ---- bottom-left ticker ---- */
-
-    .ticker {
-      position: fixed;
-      left: 14px;
-      bottom: 8px;
-      width: 150px;
-      /* Above the enter screen's scrim so it stays crisp while the overlay
+  .ticker {
+    position: fixed;
+    left: 14px;
+    bottom: 8px;
+    width: 150px;
+    /* Above the enter screen's scrim so it stays crisp while the overlay
        is up; harmless once the overlay is gone. */
-      z-index: 11;
-      overflow: hidden;
-      /* Parks centred just below the prompt, then travels to the corner on
+    z-index: 11;
+    overflow: hidden;
+    /* Parks centred just below the prompt, then travels to the corner on
        entry. Offsetting by transform rather than swapping left/bottom
        keeps it a single animatable property. 89px = left + half width. */
-      transform: translate(calc(50vw - 89px), calc(-50vh + 58px));
-      transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
-      /* Short fade on the leading edge so the text can sit close to the
+    transform: translate(calc(50vw - 89px), calc(-50vh + 58px));
+    transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Short fade on the leading edge so the text can sit close to the
        corner, longer one on the trailing edge where it scrolls away. */
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
-    }
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
+  }
 
-    body.entered .ticker {
-      transform: translate(0, 0);
-    }
+  body.entered .ticker {
+    transform: translate(0, 0);
+  }
 
-    .ticker h1 {
-      display: flex;
-      /* Without this the element is only as wide as .ticker (150px), so the
+  .ticker h1 {
+    display: flex;
+    /* Without this the element is only as wide as .ticker (150px), so the
        -50% below resolves to 75px instead of half the list, and the loop
        snaps back mid-word. max-content makes -50% exact. */
-      width: max-content;
-      margin: 0;
-      white-space: nowrap;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: rgba(255, 255, 255, 0.72);
-      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-      user-select: none;
-      /* The list below is doubled, so travelling exactly -50% lands on an
+    width: max-content;
+    margin: 0;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.72);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+    user-select: none;
+    /* The list below is doubled, so travelling exactly -50% lands on an
        identical glyph and the loop has no seam. */
-      animation: drift 3.2s linear infinite;
-      will-change: transform;
-    }
+    animation: drift 3.2s linear infinite;
+    will-change: transform;
+  }
 
-    .ticker span {
-      padding-right: 1.5em;
-    }
+  .ticker span {
+    padding-right: 1.5em;
+  }
 
-    @keyframes drift {
-      from {
-        transform: translateX(0);
-      }
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
 
-      to {
-        transform: translateX(-50%);
-      }
-    }
+  /* ---- volume slider ---- */
 
-    /* ---- volume slider ---- */
+  .volume {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(6px);
+    color: #fff;
+  }
 
-    .volume {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.28);
-      backdrop-filter: blur(6px);
-      color: #fff;
-    }
+  .volume svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+    opacity: 0.85;
+    flex: none;
+  }
 
-    .volume svg {
-      width: 15px;
-      height: 15px;
-      display: block;
-      opacity: 0.85;
-      flex: none;
-    }
+  .volume input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 92px;
+    height: 3px;
+    margin: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.32);
+    cursor: pointer;
+  }
 
-    .volume input {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 92px;
-      height: 3px;
-      margin: 0;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.32);
-      cursor: pointer;
-    }
+  .volume input:focus-visible { outline: 2px solid #fff; outline-offset: 6px; }
 
-    .volume input:focus-visible {
-      outline: 2px solid #fff;
-      outline-offset: 6px;
-    }
+  .volume input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  }
 
-    .volume input::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border: 0;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
-    }
+  .volume input::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  }
 
-    .volume input::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      border: 0;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      #bg {
-        display: none;
-      }
-
-      #viz {
-        display: none;
-      }
-
-      body {
-        background: #0a1230 url("poster.jpg") center / cover no-repeat;
-      }
-
-      .enter p {
-        animation: none;
-        opacity: 0.9;
-      }
-
-      .ticker {
-        transition: none;
-      }
-
-      .ticker h1 {
-        animation: none;
-      }
-
-      /* animation is suppressed here, so reveal the wordmark outright. */
-      body.entered .wordmark {
-        animation: none;
-        opacity: 1;
-      }
-    }
-  </style>
+  @media (prefers-reduced-motion: reduce) {
+    #bg { display: none; }
+    #viz { display: none; }
+    body { background: #0a1230 url("poster.jpg") center / cover no-repeat; }
+    .enter p { animation: none; opacity: 0.9; }
+    .ticker { transition: none; }
+    .ticker h1 { animation: none; }
+    /* animation is suppressed here, so reveal the wordmark outright. */
+    body.entered .wordmark { animation: none; opacity: 1; }
+  }
+</style>
 </head>
-
 <body>
 
-  <video id="bg" autoplay muted loop playsinline poster="poster.jpg">
-    <source src="bg.mp4" type="video/mp4">
-  </video>
+<video id="bg" autoplay muted loop playsinline poster="poster.jpg">
+  <source src="bg.mp4" type="video/mp4">
+</video>
 
-  <canvas id="viz" aria-hidden="true"></canvas>
+<canvas id="viz" aria-hidden="true"></canvas>
 
-  <h1 class="wordmark" id="wordmark">civx</h1>
+<h1 class="wordmark" id="wordmark">civx<img class="star s1" src="star.png" alt="" aria-hidden="true"><img class="star s2" src="star.png" alt="" aria-hidden="true"><img class="star s3" src="star.png" alt="" aria-hidden="true"><img class="star s4" src="star.png" alt="" aria-hidden="true"></h1>
 
-  <div class="ticker">
-    <h1>
-      <span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span>
-      <span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span>
-    </h1>
-  </div>
+<div class="ticker">
+  <h1>
+    <span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span>
+    <span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span>
+  </h1>
+</div>
 
-  <div class="volume">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-      stroke-linejoin="round" aria-hidden="true">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
-    </svg>
-    <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
-  </div>
+<div class="volume">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+  </svg>
+  <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
+</div>
 
-  <audio id="track" src="track.mp3" preload="auto"></audio>
+<audio id="track" src="track.mp3" preload="auto"></audio>
 
-  <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
-    <p>click anywhere</p>
-  </div>
+<div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
+  <p>click anywhere</p>
+</div>
 
-  <script>
-    const track = document.getElementById("track");
-    const volume = document.getElementById("volume");
-    const enter = document.getElementById("enter");
-    const canvas = document.getElementById("viz");
+<script>
+  const track  = document.getElementById("track");
+  const volume = document.getElementById("volume");
+  const enter  = document.getElementById("enter");
+  const canvas = document.getElementById("viz");
 
-    track.volume = volume.value / 100;
+  track.volume = volume.value / 100;
 
-    let entered = false;
+  let entered = false;
 
-    /* ---- spectrum ---- */
+  /* ---- spectrum ---- */
 
-    const ctx = canvas.getContext("2d");
-    let analyser, bins, gradient, W, H;
+  const ctx = canvas.getContext("2d");
+  let analyser, bins, gradient, W, H;
 
-    function resize() {
-      const dpr = window.devicePixelRatio || 1;
-      W = canvas.clientWidth;
-      H = canvas.clientHeight;
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    W = canvas.clientWidth;
+    H = canvas.clientHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Tips read white, bases warm — rebuilt on resize since it's tied to H.
-      gradient = ctx.createLinearGradient(0, H * 0.1, 0, H);
-      gradient.addColorStop(0, "#ffffff");
-      gradient.addColorStop(0.45, "#ffdca8");
-      gradient.addColorStop(1, "#ff8a1e");
+    // Tips read white, bases warm — rebuilt on resize since it's tied to H.
+    gradient = ctx.createLinearGradient(0, H * 0.1, 0, H);
+    gradient.addColorStop(0,    "#ffffff");
+    gradient.addColorStop(0.45, "#ffdca8");
+    gradient.addColorStop(1,    "#ff8a1e");
+  }
+
+  function draw() {
+    requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(bins);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = gradient;
+
+    const count = Math.max(48, Math.floor(W / 15));
+    const slot  = W / count;
+    const barW  = slot * 0.55;
+    // Two pixels past the edge: canvas bitmaps get floored to whole device
+    // pixels, so on fractional-DPR displays an exact H can leave a hairline.
+    // The overflow is clipped by the canvas, so this costs nothing.
+    const base  = H + 2;
+    const maxH  = H - 8;
+
+    for (let i = 0; i < count; i++) {
+      // Squaring the index spreads the low end out; music has far more
+      // energy down there, so a linear map would leave most bars flat.
+      const bin = Math.floor(Math.pow(i / count, 2) * bins.length * 0.7);
+      const h = Math.max(barW, (bins[bin] / 255) * maxH);
+      const x = i * slot + (slot - barW) / 2;
+
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        // Top corners only — rounding the bottom would leave visible
+        // notches now that the bases sit on the screen edge.
+        ctx.roundRect(x, base - h, barW, h, [barW / 2, barW / 2, 0, 0]);
+      } else {
+        ctx.rect(x, base - h, barW, h);
+      }
+      ctx.fill();
     }
+  }
 
-    function draw() {
+  function startSpectrum() {
+    try {
+      const audio = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audio.createMediaElementSource(track);
+      analyser = audio.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.82;
+
+      // The analyser has to pass through to the speakers, otherwise routing
+      // the element into the graph silences it.
+      source.connect(analyser);
+      analyser.connect(audio.destination);
+      audio.resume();
+
+      bins = new Uint8Array(analyser.frequencyBinCount);
+      resize();
+      window.addEventListener("resize", resize);
       requestAnimationFrame(draw);
-      analyser.getByteFrequencyData(bins);
-
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = gradient;
-
-      const count = Math.max(48, Math.floor(W / 15));
-      const slot = W / count;
-      const barW = slot * 0.55;
-      // Two pixels past the edge: canvas bitmaps get floored to whole device
-      // pixels, so on fractional-DPR displays an exact H can leave a hairline.
-      // The overflow is clipped by the canvas, so this costs nothing.
-      const base = H + 2;
-      const maxH = H - 8;
-
-      for (let i = 0; i < count; i++) {
-        // Squaring the index spreads the low end out; music has far more
-        // energy down there, so a linear map would leave most bars flat.
-        const bin = Math.floor(Math.pow(i / count, 2) * bins.length * 0.7);
-        const h = Math.max(barW, (bins[bin] / 255) * maxH);
-        const x = i * slot + (slot - barW) / 2;
-
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          // Top corners only — rounding the bottom would leave visible
-          // notches now that the bases sit on the screen edge.
-          ctx.roundRect(x, base - h, barW, h, [barW / 2, barW / 2, 0, 0]);
-        } else {
-          ctx.rect(x, base - h, barW, h);
-        }
-        ctx.fill();
-      }
+    } catch (e) {
+      // No visualiser, but the track still plays normally.
+      canvas.style.display = "none";
     }
+  }
 
-    function startSpectrum() {
-      try {
-        const audio = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audio.createMediaElementSource(track);
-        analyser = audio.createAnalyser();
-        analyser.fftSize = 2048;
-        analyser.smoothingTimeConstant = 0.82;
+  /* ---- entry ---- */
 
-        // The analyser has to pass through to the speakers, otherwise routing
-        // the element into the graph silences it.
-        source.connect(analyser);
-        analyser.connect(audio.destination);
-        audio.resume();
+  function enterSite() {
+    if (entered) return;
+    entered = true;
 
-        bins = new Uint8Array(analyser.frequencyBinCount);
-        resize();
-        window.addEventListener("resize", resize);
-        requestAnimationFrame(draw);
-      } catch (e) {
-        // No visualiser, but the track still plays normally.
-        canvas.style.display = "none";
-      }
-    }
+    startSpectrum();
 
-    /* ---- entry ---- */
+    // A click is the user gesture every browser requires, so this is the
+    // one moment playback is reliably allowed. No fallback needed.
+    track.play().catch(() => {});
 
-    function enterSite() {
-      if (entered) return;
-      entered = true;
+    document.body.classList.add("entered");
+    enter.classList.add("gone");
 
-      startSpectrum();
+    // Drop it from the tree once the fade is done.
+    enter.addEventListener("transitionend", () => enter.remove(), { once: true });
+  }
 
-      // A click is the user gesture every browser requires, so this is the
-      // one moment playback is reliably allowed. No fallback needed.
-      track.play().catch(() => { });
+  enter.addEventListener("click", enterSite);
+  document.addEventListener("keydown", enterSite);
 
-      document.body.classList.add("entered");
-      enter.classList.add("gone");
-
-      // Drop it from the tree once the fade is done.
-      enter.addEventListener("transitionend", () => enter.remove(), { once: true });
-    }
-
-    enter.addEventListener("click", enterSite);
-    document.addEventListener("keydown", enterSite);
-
-    volume.addEventListener("input", () => {
-      track.volume = volume.value / 100;
-    });
-  </script>
+  volume.addEventListener("input", () => {
+    track.volume = volume.value / 100;
+  });
+</script>
 
 </body>
-
 </html>
