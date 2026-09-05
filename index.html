@@ -173,22 +173,34 @@
 
     .ticker {
       position: fixed;
-      left: 14px;
+      left: 0;
+      right: 0;
       bottom: 8px;
-      width: 150px;
       z-index: 11;
       overflow: hidden;
-      transform: translate(calc(50vw - 89px), calc(-50vh + 58px));
-      transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
+      opacity: 0;
+      transition: opacity 0.6s ease 0.25s;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent);
     }
 
     body.entered .ticker {
-      transform: translate(0, 0);
+      opacity: 1;
     }
 
-    .ticker h1 {
+    .ticker-top {
+      position: absolute;
+      top: calc(50% + 24px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: var(--prompt-w, 150px);
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+    }
+
+    .ticker h1,
+    .ticker-top h1 {
       display: flex;
       width: max-content;
       margin: 0;
@@ -199,11 +211,16 @@
       color: rgba(255, 255, 255, 0.72);
       text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
       user-select: none;
-      animation: drift 3.2s linear infinite;
+      animation: drift 14s linear infinite;
       will-change: transform;
     }
 
-    .ticker span {
+    .ticker-top h1 {
+      animation-duration: 15s;
+    }
+
+    .ticker span,
+    .ticker-top span {
       padding-right: 1.5em;
     }
 
@@ -293,11 +310,8 @@
         opacity: 0.9;
       }
 
-      .ticker {
-        transition: none;
-      }
-
-      .ticker h1 {
+      .ticker h1,
+      .ticker-top h1 {
         animation: none;
       }
 
@@ -351,6 +365,9 @@
 
   <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
     <p>click anywhere</p>
+    <div class="ticker-top">
+      <h1></h1>
+    </div>
   </div>
 
   <script>
@@ -451,6 +468,30 @@
     volume.addEventListener("input", () => {
       track.volume = volume.value / 100;
     });
+
+    const prompt = document.querySelector(".enter p");
+
+    function syncPromptWidth() {
+      if (!prompt) return;
+      document.documentElement.style.setProperty(
+        "--prompt-w", prompt.getBoundingClientRect().width + "px");
+    }
+
+    syncPromptWidth();
+    window.addEventListener("resize", syncPromptWidth);
+
+    const tickerUnit = document.querySelector(".ticker h1").innerHTML;
+
+    function fillTickers() {
+      document.querySelectorAll(".ticker h1, .ticker-top h1").forEach(row => {
+        row.innerHTML = tickerUnit;
+        while (row.scrollWidth < window.innerWidth) row.innerHTML += tickerUnit;
+        row.innerHTML += row.innerHTML;
+      });
+    }
+
+    fillTickers();
+    window.addEventListener("resize", fillTickers);
 
     const TITLE = "civx";
     const HOLD = 4;
