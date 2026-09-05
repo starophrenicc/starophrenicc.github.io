@@ -14,8 +14,8 @@
      absolute URL — a relative path silently produces no image. -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://civx.lol/">
-  <meta property="og:title" content="love ya ᢉ𐭩">
-  <meta property="og:description" content="civx.lol">
+  <meta property="og:title" content="civx">
+  <meta property="og:description" content="yoooo">
   <meta property="og:image" content="https://civx.lol/poster.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <!-- Colours the vertical bar on the left of the Discord embed. -->
@@ -176,7 +176,7 @@
     }
 
     /* The wordmark now waits for the click rather than page load, so the
-     entrance and the music land together. */
+     entrance and the music land to.wordgether. */
     body.entered .wordmark {
       animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
     }
@@ -253,6 +253,21 @@
       to {
         transform: translateX(-50%);
       }
+    }
+
+    /* ---- view counter ---- */
+
+    .views {
+      position: fixed;
+      right: 14px;
+      bottom: 8px;
+      z-index: 11;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: rgba(255, 255, 255, 0.72);
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+      user-select: none;
     }
 
     /* ---- volume slider ---- */
@@ -388,6 +403,8 @@
     <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
   </div>
 
+  <div class="views" id="views">3,227 views</div>
+
   <audio id="morgue" src="morgue.mp3" preload="auto"></audio>
 
   <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
@@ -508,6 +525,35 @@
     volume.addEventListener("input", () => {
       track.volume = volume.value / 100;
     });
+
+    /* ---- view counter ---- */
+
+    // GitHub Pages is static, so the count lives in a free third-party
+    // counter keyed by a unique string. BASE is a fixed offset — the API
+    // starts from zero, so real hits are added on top of it.
+    const BASE = 3227;
+
+    fetch("https://countapi.mileshilliard.com/api/v1/hit/civx_lol_views")
+      .then(r => r.json())
+      .then(d => {
+        const n = BASE + (d.value || 0);
+        document.getElementById("views").textContent =
+          n.toLocaleString("en-US") + " views";
+      })
+      .catch(() => { }); // Leave the fallback number in place.
+
+    /* ---- scrolling tab title ---- */
+
+    // Rotating the string one character at a time reads as right-to-left
+    // motion. The separator keeps a visible gap between repetitions —
+    // browsers trim plain trailing spaces from titles.
+    const TITLE = "civx";
+    let tick = 0;
+
+    setInterval(() => {
+      document.title = TITLE.slice(tick) + TITLE.slice(0, tick);
+      tick = (tick + 1) % TITLE.length;
+    }, 320);
   </script>
 
 </body>
