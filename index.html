@@ -9,16 +9,14 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="favicon.ico">
 
-  <!-- Link preview (Discord, Twitter, iMessage, Slack). Discord doesn't run
-     JS, so everything it shows comes from these tags. og:image must be an
-     absolute URL — a relative path silently produces no image. -->
+  <!-- embeds -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://civx.lol/">
   <meta property="og:title" content="civx">
   <meta property="og:description" content="yoooo">
   <meta property="og:image" content="https://civx.lol/poster.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <!-- Colours the vertical bar on the left of the Discord embed. -->
+  <!--embed color bar -->
   <meta name="theme-color" content="#f59409">
   <style>
     html,
@@ -28,8 +26,7 @@
     }
 
     body {
-      /* Fallback + first-paint color, sampled from the clip so the
-       transition into video is invisible. */
+      /*sup*/
       background: #0a1230;
       display: grid;
       place-items: center;
@@ -46,7 +43,7 @@
       z-index: -2;
     }
 
-    /* ---- spectrum ---- */
+    /*  spectrum  */
 
     #viz {
       position: fixed;
@@ -65,7 +62,7 @@
       opacity: 1;
     }
 
-    /* ---- enter screen ---- */
+    /*  enter screen */
 
     .enter {
       position: fixed;
@@ -108,10 +105,7 @@
       pointer-events: none;
     }
 
-    /* ---- centre wordmark ---- */
 
-    /* Holds the wordmark and its line together so they centre as one block,
-     lifted a little to leave the spectrum more room below. */
     .center {
       display: grid;
       justify-items: center;
@@ -125,7 +119,7 @@
       font-weight: 700;
       letter-spacing: -0.03em;
       color: #fff;
-      /* Keeps the word legible when a bright wave passes behind it. */
+      /* word backdrop */
       text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
       user-select: none;
       opacity: 0;
@@ -142,25 +136,22 @@
       opacity: 0;
     }
 
-    /* Arrives just behind the wordmark so the two read as one entrance. */
+
     body.entered .tagline {
       animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.55s forwards;
     }
 
-    /* Sits above the i's own dot. Percentages are relative to the wordmark's
-     own box, so it stays locked to the letter at every viewport size, and
-     the em width keeps it in proportion. Nudge left/top to reposition. */
+    /* this the lil star in the i*/
     .wordmark .star {
       position: absolute;
       left: 38%;
       top: calc(30% - 0.035em);
       width: 0.09em;
       height: auto;
-      /* 16px source — keep the pixel edges hard instead of blurring. */
+      /* 16px pic so its good qual*/
       image-rendering: pixelated;
       pointer-events: none;
-      /* The centring translate has to be repeated in the keyframes below,
-       since transform is a single property and rotate would replace it. */
+      /* straight yams in my face */
       transform: translate(-50%, -50%);
       animation: spin 14s linear infinite;
     }
@@ -175,8 +166,7 @@
       }
     }
 
-    /* The wordmark now waits for the click rather than page load, so the
-     entrance and the music land together. */
+    /* this is so  the music and title play together */
     body.entered .wordmark {
       animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
     }
@@ -195,24 +185,18 @@
       }
     }
 
-    /* ---- bottom-left ticker ---- */
+    /*  bottom left animation  */
 
     .ticker {
       position: fixed;
       left: 14px;
       bottom: 8px;
       width: 150px;
-      /* Above the enter screen's scrim so it stays crisp while the overlay
-       is up; harmless once the overlay is gone. */
+      /* overlaying i*/
       z-index: 11;
       overflow: hidden;
-      /* Parks centred just below the prompt, then travels to the corner on
-       entry. Offsetting by transform rather than swapping left/bottom
-       keeps it a single animatable property. 89px = left + half width. */
       transform: translate(calc(50vw - 89px), calc(-50vh + 58px));
       transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
-      /* Short fade on the leading edge so the text can sit close to the
-       corner, longer one on the trailing edge where it scrolls away. */
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
       mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
     }
@@ -223,9 +207,6 @@
 
     .ticker h1 {
       display: flex;
-      /* Without this the element is only as wide as .ticker (150px), so the
-       -50% below resolves to 75px instead of half the list, and the loop
-       snaps back mid-word. max-content makes -50% exact. */
       width: max-content;
       margin: 0;
       white-space: nowrap;
@@ -235,8 +216,6 @@
       color: rgba(255, 255, 255, 0.72);
       text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
       user-select: none;
-      /* The list below is doubled, so travelling exactly -50% lands on an
-       identical glyph and the loop has no seam. */
       animation: drift 3.2s linear infinite;
       will-change: transform;
     }
@@ -255,23 +234,8 @@
       }
     }
 
-    /* ---- view counter ---- */
 
-    .views {
-      position: fixed;
-      right: 14px;
-      bottom: 8px;
-      z-index: 11;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: rgba(255, 255, 255, 0.72);
-      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-      user-select: none;
-    }
-
-    /* ---- volume slider ---- */
-
+    /*  volume control  */
     .volume {
       position: fixed;
       top: 20px;
@@ -403,7 +367,7 @@
     <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
   </div>
 
-  <div class="views" id="views">3,227 views</div>
+
 
   <audio id="jaydes" src="jaydes.mp3" preload="auto"></audio>
 
@@ -433,8 +397,6 @@
       canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      // Tips read white, bases warm — rebuilt on resize since it's tied to H.
       gradient = ctx.createLinearGradient(0, H * 0.1, 0, H);
       gradient.addColorStop(0, "#ffffff");
       gradient.addColorStop(0.45, "#ffdca8");
@@ -451,23 +413,16 @@
       const count = Math.max(48, Math.floor(W / 15));
       const slot = W / count;
       const barW = slot * 0.55;
-      // Two pixels past the edge: canvas bitmaps get floored to whole device
-      // pixels, so on fractional-DPR displays an exact H can leave a hairline.
-      // The overflow is clipped by the canvas, so this costs nothing.
       const base = H + 2;
       const maxH = H - 8;
 
       for (let i = 0; i < count; i++) {
-        // Squaring the index spreads the low end out; music has far more
-        // energy down there, so a linear map would leave most bars flat.
         const bin = Math.floor(Math.pow(i / count, 2) * bins.length * 0.7);
         const h = Math.max(barW, (bins[bin] / 255) * maxH);
         const x = i * slot + (slot - barW) / 2;
 
         ctx.beginPath();
         if (ctx.roundRect) {
-          // Top corners only — rounding the bottom would leave visible
-          // notches now that the bases sit on the screen edge.
           ctx.roundRect(x, base - h, barW, h, [barW / 2, barW / 2, 0, 0]);
         } else {
           ctx.rect(x, base - h, barW, h);
@@ -483,9 +438,6 @@
         analyser = audio.createAnalyser();
         analyser.fftSize = 2048;
         analyser.smoothingTimeConstant = 0.82;
-
-        // The analyser has to pass through to the speakers, otherwise routing
-        // the element into the graph silences it.
         source.connect(analyser);
         analyser.connect(audio.destination);
         audio.resume();
@@ -495,27 +447,17 @@
         window.addEventListener("resize", resize);
         requestAnimationFrame(draw);
       } catch (e) {
-        // No visualiser, but the track still plays normally.
         canvas.style.display = "none";
       }
     }
 
-    /* ---- entry ---- */
-
     function enterSite() {
       if (entered) return;
       entered = true;
-
       startSpectrum();
-
-      // A click is the user gesture every browser requires, so this is the
-      // one moment playback is reliably allowed. No fallback needed.
       track.play().catch(() => { });
-
       document.body.classList.add("entered");
       enter.classList.add("gone");
-
-      // Drop it from the tree once the fade is done.
       enter.addEventListener("transitionend", () => enter.remove(), { once: true });
     }
 
@@ -526,30 +468,12 @@
       track.volume = volume.value / 100;
     });
 
-    /* ---- view counter ---- */
 
-    // GitHub Pages is static, so the count lives in a free third-party
-    // counter keyed by a unique string. BASE is a fixed offset — the API
-    // starts from zero, so real hits are added on top of it.
-    const BASE = 3227;
 
-    fetch("https://countapi.mileshilliard.com/api/v1/hit/civx_lol_views")
-      .then(r => r.json())
-      .then(d => {
-        const n = BASE + (d.value || 0);
-        document.getElementById("views").textContent =
-          n.toLocaleString("en-US") + " views";
-      })
-      .catch(() => { }); // Leave the fallback number in place.
-
-    /* ---- tab title animation ---- */
-
-    // Types the name in, holds, deletes it a letter at a time, then rests on
-    // a Hangul filler (U+3164) — an empty title makes browsers fall back to
-    // showing the URL instead of a blank tab.
+    /*  tab animation  */
     const TITLE = "civx";
-    const HOLD = 4;  // steps sitting on the full word
-    const REST = 2;  // steps sitting blank before typing again
+    const HOLD = 4;
+    const REST = 2;
 
     const frames = [];
     for (let i = 1; i <= TITLE.length; i++) frames.push(TITLE.slice(0, i));
