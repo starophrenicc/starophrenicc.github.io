@@ -1,138 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>civx</title>
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>civx</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
 
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(160deg, #ffc93c 0%, #ffb01f 45%, #ff9d0a 100%);
-      overflow: hidden;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
+  body {
+    /* Fallback + first-paint color, sampled from the clip so the
+       transition into video is invisible. */
+    background: #0a1230;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
 
-    .bg {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      pointer-events: none;
-    }
+  #bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
 
-    .title {
-      position: relative;
-      z-index: 1;
-      font-size: clamp(4rem, 18vw, 16rem);
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      color: #fff;
-      text-shadow: 0 4px 24px rgba(200, 110, 0, 0.35);
-      user-select: none;
-    }
-  </style>
+  /* ---- spectrum ---- */
+
+  #viz {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 32vh;
+    max-height: 260px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.1s ease 0.25s;
+  }
+
+  body.entered #viz {
+    opacity: 1;
+  }
+
+  /* ---- enter screen ---- */
+
+  .enter {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    background: rgba(4, 8, 22, 0.55);
+    backdrop-filter: blur(3px);
+    cursor: pointer;
+    transition: opacity 0.55s ease, backdrop-filter 0.55s ease;
+  }
+
+  .enter p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
+    user-select: none;
+    animation: breathe 2.6s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+  }
+
+  .enter.gone {
+    opacity: 0;
+    backdrop-filter: blur(0);
+    pointer-events: none;
+  }
+
+  /* ---- centre wordmark ---- */
+
+  .wordmark {
+    margin: 0;
+    font-size: clamp(4rem, 18vw, 16rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #fff;
+    /* Keeps the word legible when a bright wave passes behind it. */
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
+    user-select: none;
+    opacity: 0;
+  }
+
+  /* The wordmark now waits for the click rather than page load, so the
+     entrance and the music land together. */
+  body.entered .wordmark {
+    animation: emerge 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
+  }
+
+  @keyframes emerge {
+    from { opacity: 0; filter: blur(24px); letter-spacing: 0.12em; }
+    to   { opacity: 1; filter: blur(0);    letter-spacing: -0.03em; }
+  }
+
+  /* ---- bottom-left ticker ---- */
+
+  .ticker {
+    position: fixed;
+    left: 26px;
+    bottom: 22px;
+    width: 150px;
+    /* Above the enter screen's scrim so it stays crisp while the overlay
+       is up; harmless once the overlay is gone. */
+    z-index: 11;
+    overflow: hidden;
+    /* Parks centred just below the prompt, then travels to the corner on
+       entry. Offsetting by transform rather than swapping left/bottom
+       keeps it a single animatable property. 101px = left + half width. */
+    transform: translate(calc(50vw - 101px), calc(-50vh + 72px));
+    transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Softens both cut edges so the text drifts in and out of nothing
+       rather than being visibly clipped by a box. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  body.entered .ticker {
+    transform: translate(0, 0);
+  }
+
+  .ticker h1 {
+    display: flex;
+    /* Without this the element is only as wide as .ticker (150px), so the
+       -50% below resolves to 75px instead of half the list, and the loop
+       snaps back mid-word. max-content makes -50% exact. */
+    width: max-content;
+    margin: 0;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.72);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+    user-select: none;
+    /* The list below is doubled, so travelling exactly -50% lands on an
+       identical glyph and the loop has no seam. */
+    animation: drift 3.2s linear infinite;
+    will-change: transform;
+  }
+
+  .ticker span {
+    padding-right: 1.5em;
+  }
+
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ---- volume slider ---- */
+
+  .volume {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(6px);
+    color: #fff;
+  }
+
+  .volume svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+    opacity: 0.85;
+    flex: none;
+  }
+
+  .volume input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 92px;
+    height: 3px;
+    margin: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.32);
+    cursor: pointer;
+  }
+
+  .volume input:focus-visible { outline: 2px solid #fff; outline-offset: 6px; }
+
+  .volume input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  }
+
+  .volume input::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #bg { display: none; }
+    #viz { display: none; }
+    body { background: #0a1230 url("poster.jpg") center / cover no-repeat; }
+    .enter p { animation: none; opacity: 0.9; }
+    .ticker { transition: none; }
+    .ticker h1 { animation: none; }
+    /* animation is suppressed here, so reveal the wordmark outright. */
+    body.entered .wordmark { animation: none; opacity: 1; }
+  }
+</style>
 </head>
-
 <body>
 
-  <svg class="bg" viewBox="0 0 1920 1200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0.3" y2="1">
-        <stop offset="0%" stop-color="#ffcf49" />
-        <stop offset="45%" stop-color="#ffb01f" />
-        <stop offset="100%" stop-color="#ff9c08" />
-      </linearGradient>
-      <linearGradient id="veil" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30" />
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05" />
-      </linearGradient>
-      <g id="spark">
-        <path d="M0,-26 C3,-7 7,-3 26,0 C7,3 3,7 0,26 C-3,7 -7,3 -26,0 C-7,-3 -3,-7 0,-26 Z" fill="#fff" />
-      </g>
-    </defs>
+<video id="bg" autoplay muted loop playsinline poster="poster.jpg">
+  <source src="bg.mp4" type="video/mp4">
+</video>
 
-    <rect width="1920" height="1200" fill="url(#sky)" />
+<canvas id="viz" aria-hidden="true"></canvas>
 
-    <path d="M1920,0 C1560,260 1280,620 1150,1200 L1920,1200 Z" fill="url(#veil)" />
-    <path d="M1920,150 C1640,400 1400,760 1330,1200 L1620,1200 C1660,780 1800,420 1920,300 Z" fill="#ffffff"
-      opacity="0.18" />
+<h1 class="wordmark" id="wordmark">civx</h1>
 
-    <path d="M0,900 C420,760 780,700 1160,780 C1470,845 1700,980 1920,1035 L1920,1200 L0,1200 Z" fill="#ffffff"
-      opacity="0.10" />
-    <path d="M0,955 C400,820 820,760 1210,850 C1520,922 1720,1050 1920,1105 L1920,1200 L0,1200 Z" fill="#ffffff"
-      opacity="0.13" />
-    <path d="M0,830 C360,700 700,660 1050,730 C1400,800 1650,930 1920,960" fill="none" stroke="#ffffff"
-      stroke-opacity="0.45" stroke-width="4" />
-    <path d="M0,880 C340,770 720,730 1090,810 C1430,884 1680,1000 1920,1030" fill="none" stroke="#ffffff"
-      stroke-opacity="0.30" stroke-width="3" />
-    <path d="M60,1040 C420,900 800,860 1180,930 C1500,990 1720,1090 1920,1120" fill="none" stroke="#ffffff"
-      stroke-opacity="0.22" stroke-width="2" />
+<div class="ticker">
+  <h1>
+    <span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span>
+    <span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span><span>.civx</span>
+  </h1>
+</div>
 
-    <g fill="none" stroke="#ffffff">
-      <circle cx="110" cy="800" r="16" stroke-width="9" stroke-opacity="0.95" />
-      <circle cx="196" cy="731" r="15" stroke-width="8" stroke-opacity="0.85" />
-      <circle cx="250" cy="752" r="19" stroke-width="10" stroke-opacity="0.75" />
-      <circle cx="308" cy="717" r="9" stroke-width="6" stroke-opacity="0.8" />
-      <circle cx="384" cy="682" r="14" stroke-width="8" stroke-opacity="0.9" />
-      <circle cx="509" cy="767" r="13" stroke-width="8" stroke-opacity="0.85" />
-      <circle cx="561" cy="690" r="18" stroke-width="10" stroke-opacity="0.9" />
-      <circle cx="686" cy="618" r="14" stroke-width="8" stroke-opacity="0.85" />
-      <circle cx="733" cy="681" r="24" stroke-width="12" stroke-opacity="0.95" />
-      <circle cx="1054" cy="800" r="16" stroke-width="9" stroke-opacity="0.9" />
-      <circle cx="1170" cy="736" r="18" stroke-width="9" stroke-opacity="0.8" />
-      <circle cx="1222" cy="782" r="17" stroke-width="9" stroke-opacity="0.85" />
-      <circle cx="1388" cy="732" r="15" stroke-width="8" stroke-opacity="0.8" />
-      <circle cx="1494" cy="843" r="14" stroke-width="8" stroke-opacity="0.85" />
-      <circle cx="1588" cy="772" r="20" stroke-width="10" stroke-opacity="0.9" />
-      <circle cx="1753" cy="719" r="18" stroke-width="9" stroke-opacity="0.85" />
-      <circle cx="1795" cy="795" r="24" stroke-width="12" stroke-opacity="0.9" />
-    </g>
-
-
-    <g fill="#ffffff">
-      <circle cx="150" cy="761" r="5" opacity="0.9" />
-      <circle cx="205" cy="682" r="4" opacity="0.85" />
-      <circle cx="238" cy="716" r="6" opacity="0.8" />
-      <circle cx="299" cy="753" r="5" opacity="0.75" />
-      <circle cx="345" cy="694" r="5" opacity="0.8" />
-      <circle cx="441" cy="686" r="6" opacity="0.85" />
-      <circle cx="546" cy="775" r="5" opacity="0.8" />
-      <circle cx="744" cy="632" r="5" opacity="0.85" />
-      <circle cx="1044" cy="757" r="5" opacity="0.8" />
-      <circle cx="1112" cy="765" r="6" opacity="0.85" />
-      <circle cx="1168" cy="789" r="4" opacity="0.75" />
-      <circle cx="1186" cy="678" r="6" opacity="0.85" />
-      <circle cx="1298" cy="742" r="5" opacity="0.8" />
-      <circle cx="1451" cy="748" r="5" opacity="0.8" />
-      <circle cx="1503" cy="789" r="6" opacity="0.85" />
-      <circle cx="1812" cy="746" r="5" opacity="0.8" />
-      <circle cx="96" cy="741" r="4" opacity="0.7" />
-      <circle cx="151" cy="759" r="4" opacity="0.7" />
-    </g>
-
-    <g opacity="0.95">
-      <use href="#spark" x="748" y="573" transform="translate(748,573) scale(0.85) translate(-748,-573)" />
-      <use href="#spark" x="316" y="672" />
-      <use href="#spark" x="632" y="748" transform="translate(632,748) scale(1.2) translate(-632,-748)" />
-      <use href="#spark" x="1320" y="706" />
-      <use href="#spark" x="1836" y="678" transform="translate(1836,678) scale(0.8) translate(-1836,-678)" />
-      <use href="#spark" x="1646" y="822" transform="translate(1646,822) scale(1.1) translate(-1646,-822)" />
-    </g>
+<div class="volume">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
   </svg>
+  <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
+</div>
 
-  <div class="title">civx</div>
+<audio id="track" src="track.mp3" preload="auto"></audio>
+
+<div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
+  <p>click anywhere</p>
+</div>
+
+<script>
+  const track  = document.getElementById("track");
+  const volume = document.getElementById("volume");
+  const enter  = document.getElementById("enter");
+  const canvas = document.getElementById("viz");
+
+  track.volume = volume.value / 100;
+
+  let entered = false;
+
+  /* ---- spectrum ---- */
+
+  const ctx = canvas.getContext("2d");
+  let analyser, bins, gradient, W, H;
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    W = canvas.clientWidth;
+    H = canvas.clientHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Tips read white, bases warm — rebuilt on resize since it's tied to H.
+    gradient = ctx.createLinearGradient(0, H * 0.1, 0, H);
+    gradient.addColorStop(0,    "#ffffff");
+    gradient.addColorStop(0.45, "#ffdca8");
+    gradient.addColorStop(1,    "#ff8a1e");
+  }
+
+  function draw() {
+    requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(bins);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = gradient;
+
+    const count = Math.max(48, Math.floor(W / 15));
+    const slot  = W / count;
+    const barW  = slot * 0.55;
+    const base  = H - 18;
+    const maxH  = base - 8;
+
+    for (let i = 0; i < count; i++) {
+      // Squaring the index spreads the low end out; music has far more
+      // energy down there, so a linear map would leave most bars flat.
+      const bin = Math.floor(Math.pow(i / count, 2) * bins.length * 0.7);
+      const h = Math.max(barW, (bins[bin] / 255) * maxH);
+      const x = i * slot + (slot - barW) / 2;
+
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(x, base - h, barW, h, barW / 2);
+      } else {
+        ctx.rect(x, base - h, barW, h);
+      }
+      ctx.fill();
+    }
+  }
+
+  function startSpectrum() {
+    try {
+      const audio = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audio.createMediaElementSource(track);
+      analyser = audio.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.82;
+
+      // The analyser has to pass through to the speakers, otherwise routing
+      // the element into the graph silences it.
+      source.connect(analyser);
+      analyser.connect(audio.destination);
+      audio.resume();
+
+      bins = new Uint8Array(analyser.frequencyBinCount);
+      resize();
+      window.addEventListener("resize", resize);
+      requestAnimationFrame(draw);
+    } catch (e) {
+      // No visualiser, but the track still plays normally.
+      canvas.style.display = "none";
+    }
+  }
+
+  /* ---- entry ---- */
+
+  function enterSite() {
+    if (entered) return;
+    entered = true;
+
+    startSpectrum();
+
+    // A click is the user gesture every browser requires, so this is the
+    // one moment playback is reliably allowed. No fallback needed.
+    track.play().catch(() => {});
+
+    document.body.classList.add("entered");
+    enter.classList.add("gone");
+
+    // Drop it from the tree once the fade is done.
+    enter.addEventListener("transitionend", () => enter.remove(), { once: true });
+  }
+
+  enter.addEventListener("click", enterSite);
+  document.addEventListener("keydown", enterSite);
+
+  volume.addEventListener("input", () => {
+    track.volume = volume.value / 100;
+  });
+</script>
 
 </body>
-
 </html>
