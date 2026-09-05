@@ -113,8 +113,8 @@
 
   .ticker {
     position: fixed;
-    left: 26px;
-    bottom: 22px;
+    left: 14px;
+    bottom: 8px;
     width: 150px;
     /* Above the enter screen's scrim so it stays crisp while the overlay
        is up; harmless once the overlay is gone. */
@@ -122,13 +122,13 @@
     overflow: hidden;
     /* Parks centred just below the prompt, then travels to the corner on
        entry. Offsetting by transform rather than swapping left/bottom
-       keeps it a single animatable property. 101px = left + half width. */
-    transform: translate(calc(50vw - 101px), calc(-50vh + 72px));
+       keeps it a single animatable property. 89px = left + half width. */
+    transform: translate(calc(50vw - 89px), calc(-50vh + 58px));
     transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
-    /* Softens both cut edges so the text drifts in and out of nothing
-       rather than being visibly clipped by a box. */
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-            mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    /* Short fade on the leading edge so the text can sit close to the
+       corner, longer one on the trailing edge where it scrolls away. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 82%, transparent);
   }
 
   body.entered .ticker {
