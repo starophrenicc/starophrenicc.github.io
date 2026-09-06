@@ -186,6 +186,17 @@
       animation: spin 14s linear infinite;
     }
 
+    .wordmark .buddy {
+      position: absolute;
+      left: 73.5%;
+      top: calc(28% - -1.03em);
+      width: 0.17em;
+      height: auto;
+      image-rendering: pixelated;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+
     @keyframes spin {
       from {
         transform: translate(-50%, -50%) rotate(0deg);
@@ -368,37 +379,37 @@
       }
 
       .socials {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      margin-top: 0.9em;
-      opacity: 0;
-    }
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-top: 0.9em;
+        opacity: 0;
+      }
 
-    .socials a {
-      display: block;
-      line-height: 0;
-    }
+      .socials a {
+        display: block;
+        line-height: 0;
+      }
 
-    .socials img {
-      height: 19px;
-      width: auto;
-      display: block;
-      opacity: 0.82;
-      filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.35));
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
+      .socials img {
+        height: 19px;
+        width: auto;
+        display: block;
+        opacity: 0.82;
+        filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.35));
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
 
-    .socials a:hover img {
-      opacity: 1;
-      transform: scale(1.12);
-    }
+      .socials a:hover img {
+        opacity: 1;
+        transform: scale(1.12);
+      }
 
-    body.entered .socials {
-      animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.7s forwards;
-    }
+      body.entered .socials {
+        animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.7s forwards;
+      }
 
-    body.entered .tagline {
+      body.entered .tagline {
         animation: none;
         opacity: 1;
       }
@@ -417,8 +428,9 @@
   <canvas id="bomb" aria-hidden="true"></canvas>
 
   <div class="center">
-    <h1 class="wordmark" id="wordmark">civx<img class="star" src="star.png" alt="" aria-hidden="true"></h1>
-    <p class="tagline">what's up ☺︎</p>
+    <h1 class="wordmark" id="wordmark">civx<img class="star" src="star.png" alt="" aria-hidden="true"><img class="buddy"
+        src="claudehappy.webp" alt="" aria-hidden="true"></h1>
+    <p class="tagline">what's up </p>
     <div class="socials">
       <a href="https://github.com/starophrenicc" target="_blank" rel="noopener noreferrer">
         <img src="github.png" alt="GitHub">
@@ -445,7 +457,7 @@
     <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
   </div>
 
-  <audio id="jaydes" preload="auto"></audio>
+  <audio id="jaydes" preload="auto" loop></audio>
   <audio id="whoosh" src="whoosh.mp3" preload="auto"></audio>
 
   <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
