@@ -139,6 +139,37 @@
       opacity: 0;
     }
 
+    .socials {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 0.9em;
+      opacity: 0;
+    }
+
+    .socials a {
+      display: block;
+      line-height: 0;
+    }
+
+    .socials img {
+      height: 19px;
+      width: auto;
+      display: block;
+      opacity: 0.82;
+      filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.35));
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .socials a:hover img {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+
+    body.entered .socials {
+      animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.7s forwards;
+    }
+
     body.entered .tagline {
       animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.55s forwards;
     }
@@ -336,7 +367,38 @@
         opacity: 1;
       }
 
-      body.entered .tagline {
+      .socials {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 0.9em;
+      opacity: 0;
+    }
+
+    .socials a {
+      display: block;
+      line-height: 0;
+    }
+
+    .socials img {
+      height: 19px;
+      width: auto;
+      display: block;
+      opacity: 0.82;
+      filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.35));
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .socials a:hover img {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+
+    body.entered .socials {
+      animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.7s forwards;
+    }
+
+    body.entered .tagline {
         animation: none;
         opacity: 1;
       }
@@ -357,6 +419,14 @@
   <div class="center">
     <h1 class="wordmark" id="wordmark">civx<img class="star" src="star.png" alt="" aria-hidden="true"></h1>
     <p class="tagline">what's up ☺︎</p>
+    <div class="socials">
+      <a href="https://github.com/starophrenicc" target="_blank" rel="noopener noreferrer">
+        <img src="github.png" alt="GitHub">
+      </a>
+      <a href="https://discord.com/users/924745421321039934" target="_blank" rel="noopener noreferrer">
+        <img src="discord.png" alt="Discord">
+      </a>
+    </div>
   </div>
 
   <div class="ticker">
