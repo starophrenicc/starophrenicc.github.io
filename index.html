@@ -9,10 +9,12 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="favicon.ico">
 
+  <meta name="description" content="civx — what's up ☺︎">
+
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://civx.lol/">
   <meta property="og:title" content="civx">
-  <meta property="og:description" content="yoooo">
+  <meta property="og:description" content="what's up ☺︎">
   <meta property="og:image" content="https://civx.lol/poster.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#f59409">
@@ -24,7 +26,12 @@
     }
 
     body {
-      background: #0a1230;
+      height: 100dvh;
+      overscroll-behavior: none;
+    }
+
+    body {
+      background: #f59409;
       display: grid;
       place-items: center;
       overflow: hidden;
@@ -174,11 +181,15 @@
       animation: emerge 1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.55s forwards;
     }
 
+    .wordmark .glyph {
+      position: relative;
+    }
+
     .wordmark .star {
       position: absolute;
-      left: 38%;
-      top: calc(30% - 0.035em);
-      width: 0.09em;
+      left: 57%;
+      top: 0.315em;
+      width: 0.08em;
       height: auto;
       image-rendering: pixelated;
       pointer-events: none;
@@ -265,7 +276,7 @@
       color: rgba(255, 255, 255, 0.72);
       text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
       user-select: none;
-      animation: drift 14s linear infinite;
+      animation: drift 30s linear infinite;
       will-change: transform;
     }
 
@@ -300,6 +311,16 @@
       background: rgba(0, 0, 0, 0.28);
       backdrop-filter: blur(6px);
       color: #fff;
+    }
+
+    .volume[data-level="0"] .wave1,
+    .volume[data-level="0"] .wave2,
+    .volume[data-level="1"] .wave2 {
+      display: none;
+    }
+
+    .volume:not([data-level="0"]) .mute {
+      display: none;
     }
 
     .volume svg {
@@ -356,7 +377,7 @@
       }
 
       body {
-        background: #0a1230 url("poster.jpg") center / cover no-repeat;
+        background: #f59409 url("poster.jpg") center / cover no-repeat;
       }
 
       .enter p {
@@ -428,8 +449,9 @@
   <canvas id="bomb" aria-hidden="true"></canvas>
 
   <div class="center">
-    <h1 class="wordmark" id="wordmark">civx<img class="star" src="star.png" alt="" aria-hidden="true"><img class="buddy"
-        src="claudehappy.webp" alt="" aria-hidden="true"></h1>
+    <h1 class="wordmark" id="wordmark">c<span class="glyph">i<img class="star" src="star.png" alt="" aria-hidden="true"
+          draggable="false"></span>vx<img class="buddy" src="claudehappy.webp" alt="" aria-hidden="true"
+        draggable="false"></h1>
     <p class="tagline">what's up </p>
     <div class="socials">
       <a href="https://github.com/starophrenicc" target="_blank" rel="noopener noreferrer">
@@ -448,11 +470,14 @@
     </h1>
   </div>
 
-  <div class="volume">
+  <div class="volume" id="volumeUi" data-level="1">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
       stroke-linejoin="round" aria-hidden="true">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-      <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+      <path class="wave1" d="M15 9.5a4 4 0 0 1 0 5"></path>
+      <path class="wave2" d="M18 7a8 8 0 0 1 0 10"></path>
+      <line class="mute" x1="16" y1="9.5" x2="21" y2="14.5"></line>
+      <line class="mute" x1="21" y1="9.5" x2="16" y2="14.5"></line>
     </svg>
     <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
   </div>
@@ -480,10 +505,26 @@
 
     track.src = TRACKS[Math.floor(Math.random() * TRACKS.length)];
 
-    track.volume = volume.value / 100;
-    whoosh.volume = volume.value / 100;
+    const volumeUi = document.getElementById("volumeUi");
+
+    function syncVolume() {
+      const v = volume.value / 100;
+      track.volume = v;
+      whoosh.volume = v;
+      volumeUi.dataset.level = v === 0 ? "0" : v < 0.5 ? "1" : "2";
+    }
+
+    syncVolume();
 
     let entered = false;
+
+    function debounce(fn, ms) {
+      let t;
+      return () => {
+        clearTimeout(t);
+        t = setTimeout(fn, ms);
+      };
+    }
 
     const ctx = canvas.getContext("2d");
     let analyser, bins, gradient, W, H;
@@ -497,8 +538,8 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       gradient = ctx.createLinearGradient(0, H * 0.1, 0, H);
       gradient.addColorStop(0, "#ffffff");
-      gradient.addColorStop(0.45, "#ffdca8");
-      gradient.addColorStop(1, "#ff8a1e");
+      gradient.addColorStop(0.5, "#fff2dc");
+      gradient.addColorStop(1, "#ffc078");
     }
 
     function draw() {
@@ -542,7 +583,7 @@
 
         bins = new Uint8Array(analyser.frequencyBinCount);
         resize();
-        window.addEventListener("resize", resize);
+        window.addEventListener("resize", debounce(resize, 150));
         requestAnimationFrame(draw);
       } catch (e) {
         canvas.style.display = "none";
@@ -629,13 +670,27 @@
       })();
     }
 
+    function seenBefore() {
+      try {
+        return sessionStorage.getItem("civx-entered") === "1";
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function markSeen() {
+      try {
+        sessionStorage.setItem("civx-entered", "1");
+      } catch (e) { }
+    }
+
     function enterSite() {
       if (entered) return;
       entered = true;
       startSpectrum();
       enter.classList.add("gone");
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (seenBefore() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.body.classList.add("entered");
         enter.remove();
         bomb.remove();
@@ -643,7 +698,7 @@
         return;
       }
 
-      whoosh.volume = volume.value / 100;
+      markSeen();
       whoosh.play().catch(() => { });
 
       runBomb(() => {
@@ -660,10 +715,7 @@
     enter.addEventListener("click", enterSite);
     document.addEventListener("keydown", enterSite);
 
-    volume.addEventListener("input", () => {
-      track.volume = volume.value / 100;
-      whoosh.volume = volume.value / 100;
-    });
+    volume.addEventListener("input", syncVolume);
 
     const prompt = document.querySelector(".enter p");
 
@@ -674,12 +726,13 @@
     }
 
     syncPromptWidth();
-    window.addEventListener("resize", syncPromptWidth);
+    window.addEventListener("resize", debounce(syncPromptWidth, 150));
 
     const tickerUnit = document.querySelector(".ticker h1").innerHTML;
 
     function fillTickers() {
       document.querySelectorAll(".ticker h1, .ticker-top h1").forEach(row => {
+        if (row.scrollWidth / 2 >= window.innerWidth) return;
         row.innerHTML = tickerUnit;
         while (row.scrollWidth < window.innerWidth) row.innerHTML += tickerUnit;
         row.innerHTML += row.innerHTML;
@@ -687,7 +740,7 @@
     }
 
     fillTickers();
-    window.addEventListener("resize", fillTickers);
+    window.addEventListener("resize", debounce(fillTickers, 200));
 
     const TITLE = "civx";
     const HOLD = 4;
@@ -702,6 +755,7 @@
     let step = 0;
 
     setInterval(() => {
+      if (document.hidden) return;
       document.title = frames[step % frames.length];
       step++;
     }, 260);
