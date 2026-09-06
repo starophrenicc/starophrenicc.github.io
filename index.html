@@ -376,6 +376,7 @@
   </div>
 
   <audio id="jaydes" preload="auto"></audio>
+  <audio id="whoosh" src="whoosh.mp3" preload="auto"></audio>
 
   <div class="enter" id="enter" role="button" tabindex="0" aria-label="Enter">
     <p>click anywhere</p>
@@ -389,6 +390,7 @@
     const volume = document.getElementById("volume");
     const enter = document.getElementById("enter");
     const canvas = document.getElementById("viz");
+    const whoosh = document.getElementById("whoosh");
 
     const TRACKS = [
       "JaydesJaydes.mp3",
@@ -399,6 +401,7 @@
     track.src = TRACKS[Math.floor(Math.random() * TRACKS.length)];
 
     track.volume = volume.value / 100;
+    whoosh.volume = volume.value / 100;
 
     let entered = false;
 
@@ -468,10 +471,8 @@
 
     const bomb = document.getElementById("bomb");
     const bctx = bomb.getContext("2d");
-    const starImg = new Image();
-    starImg.src = "star.png";
 
-    const STICKERS = ["civx", ".civx", "JamL", "civx.lol"];
+    const STICKERS = [".civx", "JamL"];
     const CX = 104;
     const CY = 46;
     const PER_FRAME = 16;
@@ -487,7 +488,6 @@
             x: x * CX + (y % 2 ? CX / 2 : 0) + (Math.random() - 0.5) * CX * 0.3,
             y: y * CY + (Math.random() - 0.5) * CY * 0.3,
             r: (Math.random() * 50 - 25) * Math.PI / 180,
-            star: Math.random() < 0.26,
             alt: Math.random() < 0.5,
             text: STICKERS[Math.floor(Math.random() * STICKERS.length)],
             size: 26 + Math.random() * 16
@@ -514,21 +514,16 @@
       bctx.translate(s.x, s.y);
       bctx.rotate(s.r);
 
-      if (s.star && starImg.complete && starImg.naturalWidth) {
-        const w = Math.max(s.size * 2.7, CX * 1.25);
-        bctx.drawImage(starImg, -w / 2, -w / 2, w, w);
-      } else {
-        bctx.font = "700 " + s.size + "px 'Helvetica Neue', Helvetica, Arial, sans-serif";
-        const tw = bctx.measureText(s.text).width;
-        const pw = Math.max(tw + s.size * 0.9, CX * 1.25);
-        const ph = Math.max(s.size * 1.5, CY * 1.45);
-        bctx.fillStyle = s.alt ? "#f59409" : "#ffffff";
-        pill(-pw / 2, -ph / 2, pw, ph, s.size * 0.3);
-        bctx.fillStyle = s.alt ? "#ffffff" : "#f59409";
-        bctx.textAlign = "center";
-        bctx.textBaseline = "middle";
-        bctx.fillText(s.text, 0, 1);
-      }
+      bctx.font = "700 " + s.size + "px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+      const tw = bctx.measureText(s.text).width;
+      const pw = Math.max(tw + s.size * 0.9, CX * 1.25);
+      const ph = Math.max(s.size * 1.5, CY * 1.45);
+      bctx.fillStyle = s.alt ? "#f59409" : "#ffffff";
+      pill(-pw / 2, -ph / 2, pw, ph, s.size * 0.3);
+      bctx.fillStyle = s.alt ? "#ffffff" : "#f59409";
+      bctx.textAlign = "center";
+      bctx.textBaseline = "middle";
+      bctx.fillText(s.text, 0, 1);
 
       bctx.restore();
     }
@@ -558,20 +553,26 @@
       if (entered) return;
       entered = true;
       startSpectrum();
-      track.play().catch(() => { });
       enter.classList.add("gone");
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.body.classList.add("entered");
         enter.remove();
         bomb.remove();
+        track.play().catch(() => { });
         return;
       }
+
+      whoosh.volume = volume.value / 100;
+      whoosh.play().catch(() => { });
 
       runBomb(() => {
         document.body.classList.add("entered");
         enter.remove();
-        setTimeout(() => bomb.classList.add("clear"), 260);
+        setTimeout(() => {
+          bomb.classList.add("clear");
+          track.play().catch(() => { });
+        }, 260);
         setTimeout(() => bomb.remove(), 900);
       });
     }
@@ -581,6 +582,7 @@
 
     volume.addEventListener("input", () => {
       track.volume = volume.value / 100;
+      whoosh.volume = volume.value / 100;
     });
 
     const prompt = document.querySelector(".enter p");
