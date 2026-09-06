@@ -276,7 +276,7 @@
       color: rgba(255, 255, 255, 0.72);
       text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
       user-select: none;
-      animation: drift 30s linear infinite;
+      animation: drift 18s linear infinite;
       will-change: transform;
     }
 
@@ -670,27 +670,13 @@
       })();
     }
 
-    function seenBefore() {
-      try {
-        return sessionStorage.getItem("civx-entered") === "1";
-      } catch (e) {
-        return false;
-      }
-    }
-
-    function markSeen() {
-      try {
-        sessionStorage.setItem("civx-entered", "1");
-      } catch (e) { }
-    }
-
     function enterSite() {
       if (entered) return;
       entered = true;
       startSpectrum();
       enter.classList.add("gone");
 
-      if (seenBefore() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.body.classList.add("entered");
         enter.remove();
         bomb.remove();
@@ -698,7 +684,6 @@
         return;
       }
 
-      markSeen();
       whoosh.play().catch(() => { });
 
       runBomb(() => {
