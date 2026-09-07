@@ -554,7 +554,7 @@
       <line class="mute" x1="16" y1="9.5" x2="21" y2="14.5"></line>
       <line class="mute" x1="21" y1="9.5" x2="16" y2="14.5"></line>
     </svg>
-    <input type="range" id="volume" min="0" max="100" value="20" aria-label="Volume">
+    <input type="range" id="volume" min="0" max="100" value="50" aria-label="Volume">
   </div>
 
   <audio id="jaydes" preload="auto" loop></audio>
@@ -585,7 +585,7 @@
     function syncVolume() {
       const v = volume.value / 100;
       track.volume = v;
-      whoosh.volume = v;
+      whoosh.volume = Math.min(1, v * 2.8);
       volumeUi.dataset.level = v === 0 ? "0" : v < 0.5 ? "1" : "2";
     }
 
